@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Digit77 Helper
 // @namespace    cn.XYZliang.digit77Helper
-// @version      2.4.5
+// @version      2.4.6
 // @description  自动复制提取码，跳过ouo.io的三秒等待时间！
 // @require      https://code.jquery.com/jquery-3.7.1.min.js
 // @license      GNU General Public License v3.0
 // @author       XYZliang
-// @homepage     https://greasyfork.org/zh-CN/scripts/445961-digit77-helper
+// @homepage     https://greasyfork.org/zh-CN/scripts/495107-digit77-helper
 // @match        *://www.digit77.com/*
 // @match        *://ouo.io/*
 // @match        *://ouo.press/*
@@ -42,15 +42,8 @@ let settings = GM_getValue('settings', {
 	error: true,
 });
 
-// Clean up values if exceeding 200 entries
-let values = GM_listValues();
-if (values.length > 200) {
-	values.forEach((value) => {
-		if (value !== 'settings') GM_deleteValue(value);
-		if (values.length < 30) return;
-	});
-	consoleLog('已自动清除缓存！');
-}
+// Clean up
+cleanupStorage();
 
 let url = location.host;
 // Main logic goes here ---------------------------------------------------------
@@ -89,7 +82,8 @@ function handleCloakingGo(pw) {
 						let finalUrlWithPwd = addGetParameter(
 							realLink,
 							'Digit77HelperPwd',
-							GM_getValue(pw),
+							//GM_getValue(pw),
+							getPasscode(pw),
 						);
 						setTimeout(() => {
 							window.location.href = finalUrlWithPwd;
@@ -160,12 +154,14 @@ function WaitForLink() {
 		).attr('href');
 		if (link.includes('javascript')) WaitForLink();
 		let pw = location.pathname.split('/')[1];
+		let passcode = getPasscode(pw)
 		if (settings.error)
-			consoleLog('Cloaking link: ' + pw + ' pwd: ' + GM_getValue(pw));
+			consoleLog('Cloaking link: ' + pw + ' pwd: ' + passcode);
 		let finalUrl = addGetParameter(
 			link,
 			'Digit77HelperPwd',
-			GM_getValue(pw),
+			//GM_getValue(pw),
+			passcode,
 		);
 		window.location.href = finalUrl;
 	}, 2800);
@@ -175,6 +171,12 @@ function hanndleQuark() {
 	if (!settings.quark) return;
 	// get the password from parameter
 	const urlObj = new URL(window.location.href);
+
+	// if the url contains the parameter Digit77HelperPwd, then fill the password
+
+	if (!urlObj.search.includes('Digit77HelperPwd')) {
+		return;
+	}
 
 	const queryParams = new URLSearchParams(urlObj.search);
 	const digit77HelperPwd = queryParams.get('Digit77HelperPwd');
@@ -205,6 +207,7 @@ function handleOuo() {
 		$('.btn-main').text('欢迎使用Digit77 Helper');
 
 		let pathSegments = location.pathname.split('/');
+		let passcode = getPasscode(pathSegments[2]);
 		if (settings.error)
 			consoleLog(
 				'path segments: ' +
@@ -212,7 +215,8 @@ function handleOuo() {
 					' pwd key: ' +
 					pathSegments[2] +
 					' pwd: ' +
-					GM_getValue(pathSegments[2]),
+					//GM_getValue(pathSegments[2]),
+					passcode,
 			);
 		// Check if the path contains 'go' and proceed with the specific logic for those pages.
 		if (pathSegments[1] === 'go') {
@@ -233,7 +237,7 @@ function handleOuo() {
 					let finalUrl = addGetParameter(
 						response.finalUrl,
 						'Digit77HelperPwd',
-						GM_getValue(pathSegments[2]),
+						passcode,
 					);
 					if (response.status === 200) {
 						// Redirect after a slight delay to enhance ad revenue potentially.
@@ -242,11 +246,11 @@ function handleOuo() {
 							1000,
 						);
 					} else {
-						failedToGetJumpAddress(GM_getValue(pathSegments[2]));
+						failedToGetJumpAddress(getPasscode(pathSegments[2]));
 					}
 				},
 				onerror: function () {
-					failedToGetJumpAddress(GM_getValue(pathSegments[2]));
+					failedToGetJumpAddress(getPasscode(pathSegments[2]));
 				},
 			});
 		} else {
@@ -361,7 +365,7 @@ function handleLinks() {
 					const pwd = nextItem;
 					if (settings.error)
 						console.log('Key:', key, 'Password:', pwd);
-					if (settings.autofill) GM_setValue(key, pwd);
+					if (settings.autofill) setPasscode(key, pwd);
 				}
 			}
 		});
@@ -384,28 +388,37 @@ function failedToGetJumpAddress(pwd) {
 	GM_setClipboard(pwd);
 }
 
+function getToday() {
+	let date = new Date();
+	let day = date.getDate();
+	let month = date.getMonth() + 1;
+	let year = date.getFullYear();
+	let dateKey = `${day}-${month}-${year}`;
+	return dateKey;
+}
+
+function setPasscode(key, pwd) {
+	// append the password to the list of passcodes in the GM storage
+	let passcodes = GM_getValue('passcodes', {});
+	// store the passwords by the day-month-year
+	let dateKey = getToday();
+	if (!passcodes[dateKey]) passcodes[dateKey] = {};
+	passcodes[dateKey][key] = pwd;
+	GM_setValue('passcodes', passcodes);
+}
+
+function getPasscode(key) {
+	let passcodes = GM_getValue('passcodes', {});
+	let dateKey = getToday();
+	if (passcodes[dateKey] && passcodes[dateKey][key]) {
+		return passcodes[dateKey][key];
+	}
+	return null;
+}
+
 function addGetParameter(url, name, value) {
 	url += (url.split('?')[1] ? '&' : '?') + name + '=' + value;
 	return url;
-}
-
-function consoleLog(info, ...args) {
-	if (typeof info === 'object') {
-		Object.entries(info).forEach(([key, value]) => {
-			console.log(
-				`%c${key}:`,
-				'color: #007BFF; font-weight: bold;',
-				value,
-			);
-		});
-		console.log(...args);
-	} else
-		console.log(
-			'%cDetails:',
-			'color: #007BFF; font-weight: bold;',
-			info,
-			...args,
-		);
 }
 
 //  以下代码修改自 网盘智能识别助手
@@ -415,14 +428,6 @@ let util = {
 		let r = location.search.substr(1).match(reg);
 		if (r != null) return r[2];
 		return null;
-	},
-
-	getValue(name) {
-		return GM_getValue(name);
-	},
-
-	setValue(name, value) {
-		GM_setValue(name, value);
 	},
 
 	sleep(time) {
@@ -537,7 +542,7 @@ function populateSettingsForm() {
 	const actionButtonsHtml = `
         <a class="btn btn-rd btn-block btn-lg btn-coral-pink" id="save">保存设置</a>
         <a class="btn btn-rd btn-block btn-lg btn-coral-pink" id="clean">清除缓存</a>
-        <a href="https://github.com/usleolihao/Digit77Helper" target="_blank">关于插件<span class="icon-md fab fa-github linklogo"></span></a>`;
+        <a href="https://github.com/lgcyaxi" target="_blank">关于插件<span class="icon-md fab fa-github linklogo"></span></a>`;
 	formContainer.append(actionButtonsHtml);
 
 	// Attach event listeners for buttons
@@ -566,10 +571,69 @@ function populateSettingsForm() {
 	});
 }
 
+function consoleLog(info, ...args) {
+	if (typeof info === 'object') {
+		let output = '';
+		let styles = [];
+
+		Object.entries(info).forEach(([key, value]) => {
+			output += `%c${key}: %c${value}\n`;
+			styles.push('color: #007BFF; font-weight: bold;', 'color: black;');
+		});
+
+		console.log(output, ...styles, ...args);
+	} else {
+		console.log(
+			`%cDetails:\n%c${info}`,
+			'color: #007BFF; font-weight: bold;',
+			'color: black;',
+			...args,
+		);
+	}
+}
+
 function GM_ShowAllValues() {
-	let detail = 'All values: \n';
+	let output = '';
+	let styles = [];
+
+	function processValue(value, indent = '') {
+		if (typeof value === 'object' && value !== null) {
+			Object.entries(value).forEach(([key, val]) => {
+				output += `${indent}%c${key}: %c${val}\n`;
+				styles.push('color: green;', 'color: black;');
+				if (typeof val === 'object' && val !== null) {
+					processValue(val, indent + '    ');
+				}
+			});
+		} else {
+			output += `${indent}%c${value}: %c${GM_getValue(value)}\n`;
+			styles.push('color: green;', 'color: black;');
+		}
+	}
+
 	GM_listValues().forEach((value) => {
-		detail += `${value}: ${GM_getValue(value)}\n`;
+		const val = GM_getValue(value);
+		processValue({ [value]: val });
 	});
-	consoleLog(detail);
+
+	consoleLog(output, ...styles);
+}
+
+function cleanupStorage() {
+	let values = GM_listValues();
+	let todayKey = getToday();
+	values.forEach((value) => {
+		if (value !== 'passcodes' && value !== 'settings') {
+			GM_deleteValue(value);
+		} else if (value === 'passcodes') {
+			let passcodes = GM_getValue('passcodes', {});
+			Object.keys(passcodes).forEach((dateKey) => {
+				if (dateKey !== todayKey) {
+					delete passcodes[dateKey];
+				}
+			});
+			GM_setValue('passcodes', passcodes);
+		}
+	});
+	consoleLog('已自动清除缓存！');
 }
