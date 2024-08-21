@@ -5,29 +5,29 @@ problems
 
 🖐️ 你好，热爱编程，喜欢探索新技术并解决各种问题。
 
-## :hammer_and_wrench: 我正在进行的项目 / My Ongoing Projects :hammer_and_wrench:
+## 🛠 我正在进行的项目 / My Ongoing Projects 🛠
 
--   :chart_with_upwards_trend: [Roadside LiDAR Vehicle Detection](#)
--   :sparkles: [XQuickEnergy](/projs/xQuickEnergy/)
--   :rainbow: [Docsify Plugins](/projs/docsify-plugins/)
+- 📈 [Roadside LiDAR Vehicle Detection](#)
+- ✨ [XQuickEnergy](/projs/xQuickEnergy/)
+- 🌈 [Docsify Plugins](/projs/docsify-plugins/)
 
-## :trophy: Guardian of Progress (Project Maintenance) / 项目维护 :trophy:
+## 🏆 Guardian of Progress (Project Maintenance) / 项目维护 🏆
 
--   :1st_place_medal: [Visualifyjs](https://visualify.pharmacy.arizona.edu/)
--   :rocket:[Smart Home Application](https://www.lgcyaxi.net/ECE513_IOT_Project/)
--   <image src='res/digit77.png' alt="Digit77" width="25px"/></image> [Digit77 Helper]()
-  
+- 🥇 [Visualifyjs](https://visualify.pharmacy.arizona.edu/)
+- 🚀[Smart Home Application](https://www.lgcyaxi.net/ECE513_IOT_Project/)
+- `<image src='res/digit77.png' alt="Digit77" width="25px"/></image>` [Digit77 Helper](https://greasyfork.org/zh-CN/scripts/495107-digit77-helper)
+
 ## 🔥 My Skills / 我的技能 🔥
 
 <p align="left">
   <img height="120px" src="https://github-readme-stats-sigma-five.vercel.app/api/top-langs/?username=usleolihao&layout=compact&show_icons=true&theme=radical" alt="Top langs" /> 
-  &nbsp;
+   
   <img src="res/typing.gif" alt="coding" style="height:120px"  />
-  &nbsp;
+   
   <img height="120px" src="https://github-readme-stats-sigma-five.vercel.app/api?username=usleolihao&show_icons=true&theme=radical" alt="Lihao's github stats" />
 </p>
 
-### :muscle: Programming Languages / 编程语言
+### 💪 Programming Languages / 编程语言
 
 <p>
   <img alt="Python" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=darkgreen"/>
@@ -62,7 +62,7 @@ problems
   <img alt="WordPress" src="https://img.shields.io/badge/WordPress-21759B?style=for-the-badge&logo=wordpress&logoColor=white"/>
 </p>
 
-### :gear: Backend Technologies / 后端技术
+### ⚙️ Backend Technologies / 后端技术
 
 <p>
   <img alt="Express.js" src="https://img.shields.io/badge/express.js%20-%23404d59.svg?&style=for-the-badge"/>
@@ -74,7 +74,7 @@ problems
   <img alt="Restful API" src="https://img.shields.io/badge/Restful%20API-005571?style=for-the-badge&logo=restfulapi&logoColor=white"/>
 </p>
 
-### :floppy_disk: Database / 数据库
+### 💾 Database / 数据库
 
 <p>
   <img alt="MongoDB" src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white"/>
@@ -105,7 +105,7 @@ problems
   <img alt="vs" src="https://img.shields.io/badge/Visual_Studio-5C2D91?style=for-the-badge&logo=visual%20studio&logoColor=white"/>
 </p>
 
-### :cloud: Cloud / 云服务
+### ☁️ Cloud / 云服务
 
 <p>
   <img alt="AWS" src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white"/>
@@ -115,26 +115,26 @@ problems
   <img lat="TX Cloud" src="https://img.shields.io/badge/Tencent_Cloud-0078D6?style=for-the-badge&logo=tencentcloud&logoColor=white"/>
 </p>
 
-## :mailbox_with_mail: Contact Me / 联系我 :mailbox_with_mail:
+## 📬 Contact Me / 联系我 📬
 
--   :email: Email / 邮箱: leolihao@arizona.edu
--   :memo: Blog / 博客: [Fluff & Stuff](https://www.lgcyaxi.net)
--   :bust_in_silhouette: Profile / 个人资料:
-    [Resume](https://lgcyaxi.net/#/README?id=about-me)
+- ✉️ Email / 邮箱: leolihao@arizona.edu
+- 📝 Blog / 博客: [Fluff &amp; Stuff](https://www.lgcyaxi.net)
+- 👤 Profile / 个人资料:
+  [Resume](https://lgcyaxi.net/#/README?id=about-me)
 
-## :zap: Other Interests / 其他兴趣 :zap:
+## ⚡️ Other Interests / 其他兴趣 ⚡️
 
--   :video_game: Playing video games / 玩电子游戏
--   :headphones: Listening to music / 收听音乐
--   :camera: Photography / 摄影
--   :hiking_boot: Hiking / 徒步旅行
--   :books: Reading / 阅读
--   :movie_camera: Watching movies / 看电影
+- 🎮 Playing video games / 玩电子游戏
+- 🎧 Listening to music / 收听音乐
+- 📷 Photography / 摄影
+- :hiking_boot: Hiking / 徒步旅行
+- 📚 Reading / 阅读
+- 🎥 Watching movies / 看电影
 
 ---
 
-:clap: Thank you for visiting my profile / 感谢访问我的个人资料！Hope you like
-it / 希望你喜欢。:smile:
+👏 Thank you for visiting my profile / 感谢访问我的个人资料！Hope you like
+it / 希望你喜欢。😄
 
 <h4 align="center">The Github has been visited 👀</h4>
 <p align="center"><img src="https://profile-counter.glitch.me/usleolihao/count.svg" alt="usleolihao :: Visitor's Count" /></p>
