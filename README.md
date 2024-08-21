@@ -15,7 +15,7 @@ problems
 
 - 🥇 [Visualifyjs](https://visualify.pharmacy.arizona.edu/)
 - 🚀[Smart Home Application](https://www.lgcyaxi.net/ECE513_IOT_Project/)
-- `<image src='res/digit77.png' alt="Digit77" width="25px"/></image>` [Digit77 Helper](https://greasyfork.org/zh-CN/scripts/495107-digit77-helper)
+- <image src='res/digit77.png' alt="Digit77" width="25px"/></image> [Digit77 Helper](https://greasyfork.org/zh-CN/scripts/495107-digit77-helper)
 
 ## 🔥 My Skills / 我的技能 🔥
 
