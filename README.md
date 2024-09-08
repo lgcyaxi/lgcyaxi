@@ -20,11 +20,11 @@ problems
 ## 🔥 My Skills / 我的技能 🔥
 
 <p align="left">
-  <img height="120px" src="https://github-readme-stats-sigma-five.vercel.app/api/top-langs/?username=usleolihao&layout=compact&show_icons=true&theme=radical" alt="Top langs" /> 
+  <img height="120px" src="https://github-readme-stats-sigma-five.vercel.app/api/top-langs/?username=lgcyaxi&layout=compact&show_icons=true&theme=radical" alt="Top langs" /> 
    
   <img src="res/typing.gif" alt="coding" style="height:120px"  />
    
-  <img height="120px" src="https://github-readme-stats-sigma-five.vercel.app/api?username=usleolihao&show_icons=true&theme=radical" alt="Lihao's github stats" />
+  <img height="120px" src="https://github-readme-stats-sigma-five.vercel.app/api?username=lgcyaxi&show_icons=true&theme=radical" alt="Lihao's github stats" />
 </p>
 
 ### 💪 Programming Languages / 编程语言
@@ -137,7 +137,7 @@ problems
 it / 希望你喜欢。😄
 
 <h4 align="center">The Github has been visited 👀</h4>
-<p align="center"><img src="https://profile-counter.glitch.me/usleolihao/count.svg" alt="usleolihao :: Visitor's Count" /></p>
+<p align="center"><img src="https://profile-counter.glitch.me/usleolihao/count.svg" alt="lgcyaxi :: Visitor's Count" /></p>
 
 <!--
 🟩🟨🟥
