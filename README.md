@@ -136,9 +136,6 @@ problems
 👏 Thank you for visiting my profile / 感谢访问我的个人资料！Hope you like
 it / 希望你喜欢。😄
 
-<h4 align="center">The Github has been visited 👀</h4>
-<p align="center"><img src="https://profile-counter.glitch.me/usleolihao/count.svg" alt="lgcyaxi :: Visitor's Count" /></p>
-
 <!--
 🟩🟨🟥
 - :1st_place_medal: Project 1
