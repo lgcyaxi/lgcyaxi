@@ -168,3 +168,16 @@ class TextFormatter:
         cls.print_header(text=text, divider=dividers[level][0],
                          total_length=dividers[level][1],
                          color=mapping[level])
+
+
+# Module-level shortcuts so callers can `from tools.color_print import print_info, ...`
+colorize = TextFormatter.colorize
+print_header = TextFormatter.print_header
+print_title = TextFormatter.print_title
+print_info = TextFormatter.print_info
+print_success = TextFormatter.print_success
+print_warning = TextFormatter.print_warning
+print_error = TextFormatter.print_error
+print_step = TextFormatter.print_step
+print_command = TextFormatter.print_command
+custom_header = TextFormatter.custom_header
