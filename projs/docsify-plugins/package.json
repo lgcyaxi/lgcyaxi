@@ -8,7 +8,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/usleolihao"
+        "url": "https://github.com/lgcyaxi/lgcyaxi.git",
+        "directory": "projs/docsify-plugins"
     },
     "keywords": [
         "docsify",
