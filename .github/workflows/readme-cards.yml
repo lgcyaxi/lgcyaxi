@@ -1,0 +1,51 @@
+name: README cards
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/readme-cards.yml]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: readme-cards
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # GITHUB_TOKEN only sees public repos. To count private ones too, add a
+      # README_STATS_TOKEN secret (PAT with repo + read:user scopes).
+      # fail_on_error keeps the last good SVG instead of committing an error card.
+      - name: Top languages (light)
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: top-langs
+          options: username=${{ github.repository_owner }}&layout=compact&hide_border=true&bg_color=00000000
+          path: profile/top-langs.svg
+          token: ${{ secrets.README_STATS_TOKEN || secrets.GITHUB_TOKEN }}
+          fail_on_error: true
+
+      - name: Top languages (dark)
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: top-langs
+          options: username=${{ github.repository_owner }}&layout=compact&theme=github_dark&hide_border=true&bg_color=00000000
+          path: profile/top-langs-dark.svg
+          token: ${{ secrets.README_STATS_TOKEN || secrets.GITHUB_TOKEN }}
+          fail_on_error: true
+
+      - name: Commit changed cards
+        run: |
+          git add profile/
+          git diff --cached --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: refresh README cards"
+          git push
