@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Digit77 Helper
 // @namespace    cn.XYZliang.digit77Helper
-// @version      2.4.6
-// @description  自动复制提取码，跳过ouo.io的三秒等待时间！
+// @version      2.6.1
+// @description  自动复制提取码，跳过 ouo 等待；应用标题和图标可右键新窗口打开。
 // @require      https://code.jquery.com/jquery-3.7.1.min.js
 // @license      GNU General Public License v3.0
 // @author       XYZliang
@@ -202,69 +202,259 @@ function handleOuo() {
 
 	// Use .ready() to ensure the DOM is fully loaded before attempting to modify elements.
 	$(document).ready(function () {
-		// Directly set text using .text() for better consistency and compatibility.
+		const pathSegments = location.pathname.split('/');
+		// /go/:code is the 3s "Get Link" step. The page before it stays on the
+		// original click, which is the one that still submits "I'm a human".
+		if (pathSegments[1] === 'go') {
+			clickOuoGetLink(getPasscode(pathSegments[2]));
+			return;
+		}
 		$('h4').text('Digit77 Helper正在跳过等待!');
 		$('.btn-main').text('欢迎使用Digit77 Helper');
-
-		let pathSegments = location.pathname.split('/');
-		let passcode = getPasscode(pathSegments[2]);
-		if (settings.error)
-			consoleLog(
-				'path segments: ' +
-					pathSegments +
-					' pwd key: ' +
-					pathSegments[2] +
-					' pwd: ' +
-					//GM_getValue(pathSegments[2]),
-					passcode,
-			);
-		// Check if the path contains 'go' and proceed with the specific logic for those pages.
-		if (pathSegments[1] === 'go') {
-			let reallyUrlGetter = `${location.origin}/xreallcygo/${pathSegments[2]}`;
-			let reallyUrlData = $('#form-go').serialize();
-
-			// Use GM_xmlhttpRequest for cross-origin requests.
-			GM_xmlhttpRequest({
-				method: 'POST',
-				url: reallyUrlGetter,
-				data: reallyUrlData,
-				headers: {
-					'Content-Type':
-						'application/x-www-form-urlencoded;charset=UTF-8',
-				},
-				onload: function (response) {
-					// Construct the final URL with the password parameter if the request was successful.
-					let finalUrl = addGetParameter(
-						response.finalUrl,
-						'Digit77HelperPwd',
-						passcode,
-					);
-					if (response.status === 200) {
-						// Redirect after a slight delay to enhance ad revenue potentially.
-						setTimeout(
-							() => (window.location.href = finalUrl),
-							1000,
-						);
-					} else {
-						failedToGetJumpAddress(getPasscode(pathSegments[2]));
-					}
-				},
-				onerror: function () {
-					failedToGetJumpAddress(getPasscode(pathSegments[2]));
-				},
-			});
-		} else {
-			// For non-'go' pages, wait before clicking the main button to pass through ads.
-			setTimeout(() => $('.btn-main').click(), 1500);
-		}
+		setTimeout(() => $('.btn-main').click(), 1500);
 	});
 
 	console.groupEnd();
 }
 
+function clickOuoGetLink(passcode) {
+	const started = Date.now();
+	const timer = setInterval(() => {
+		const button = document.getElementById('btn-main');
+		const countdown = document.getElementById('countdown');
+		const ended = countdown && countdown.classList.contains('end');
+		if (!button) {
+			if (Date.now() - started > 8000) clearInterval(timer);
+			return;
+		}
+		if (!(ended || Date.now() - started > 4000)) return;
+		clearInterval(timer);
+		button.disabled = false;
+		if (passcode) GM_setClipboard(passcode);
+		$('#btn-main').click();
+	}, 200);
+}
+
+// Title and icon are not links, and nodes added inside the Vue card get
+// removed. These anchors live on document.body and sit only on those boxes.
+function startOpenLinks() {
+	const style = document.createElement('style');
+	style.id = 'd77-open-style';
+	style.textContent =
+		'#d77-open-layer{position:fixed;inset:0;z-index:2147483000;pointer-events:none}' +
+		'#d77-open-layer a{position:absolute;display:block;pointer-events:auto;cursor:pointer;border-radius:4px}' +
+		'#d77-open-layer a.d77-open-title:hover{background:rgba(36,91,219,.16);box-shadow:inset 0 -2px 0 #245bdb}';
+	document.head.appendChild(style);
+	const layer = document.createElement('div');
+	layer.id = 'd77-open-layer';
+	document.body.appendChild(layer);
+	let frame = 0;
+	const placeSoon = () => {
+		cancelAnimationFrame(frame);
+		frame = requestAnimationFrame(() => placeOpenLinks(layer));
+	};
+	// List/grid titles animate for 0.4s. One measurement leaves the link behind.
+	let looping = false;
+	const follow = () => {
+		if (looping) return;
+		looping = true;
+		const deadline = performance.now() + 500;
+		const step = () => {
+			placeOpenLinks(layer);
+			if (performance.now() < deadline) requestAnimationFrame(step);
+			else looping = false;
+		};
+		requestAnimationFrame(step);
+	};
+	follow();
+	document.addEventListener('scroll', placeSoon, true);
+	window.addEventListener('resize', follow);
+	document.addEventListener('transitionend', follow, true);
+	const root = document.querySelector('#__nuxt') || document.body;
+	new MutationObserver(follow).observe(root, {
+		childList: true,
+		subtree: true,
+	});
+	try {
+		const router = unsafeWindow.useNuxtApp?.().$router;
+		if (router && !router.__d77Open) {
+			router.__d77Open = true;
+			router.afterEach(() => setTimeout(follow, 50));
+		}
+	} catch (e) {}
+}
+
+function placeOpenLinks(layer) {
+	const posts = collectOpenPosts();
+	const spots = [];
+	document.querySelectorAll('.app-card').forEach((card) => {
+		const title = card.querySelector('.title');
+		const titleText = title && title.textContent.trim();
+		if (!title || !titleText) return;
+		const version = card.querySelector('.version');
+		const post = findOpenPost(
+			posts,
+			titleText,
+			version ? version.textContent.trim() : '',
+		);
+		if (!post) return;
+		const href = openPostHref(post);
+		spots.push({ el: title, href: href, kind: 'title' });
+		if (!card.classList.contains('list-mode')) {
+			const icon = card.querySelector('.app-icon');
+			if (icon) spots.push({ el: icon, href: href, kind: 'icon' });
+		}
+	});
+	while (layer.children.length > spots.length) {
+		layer.lastChild.remove();
+	}
+	spots.forEach((spot, index) => {
+		let link = layer.children[index];
+		const className =
+			spot.kind === 'title' ? 'd77-open d77-open-title' : 'd77-open';
+		if (!link) {
+			link = document.createElement('a');
+			link.addEventListener('click', onOpenLinkClick);
+			layer.appendChild(link);
+		}
+		if (link.className !== className) link.className = className;
+		if (link.getAttribute('href') !== spot.href) {
+			link.setAttribute('href', spot.href);
+		}
+		const rect = spot.el.getBoundingClientRect();
+		const visible = rect.width > 2 && rect.height > 2 && rect.bottom > 0 && rect.top < window.innerHeight;
+		link.style.display = visible ? 'block' : 'none';
+		link.style.left = rect.left + 'px';
+		link.style.top = rect.top + 'px';
+		link.style.width = rect.width + 'px';
+		link.style.height = rect.height + 'px';
+	});
+}
+
+function onOpenLinkClick(event) {
+	if (
+		event.metaKey ||
+		event.ctrlKey ||
+		event.shiftKey ||
+		event.altKey ||
+		event.button !== 0
+	) {
+		event.stopPropagation();
+		return;
+	}
+	event.preventDefault();
+	event.stopPropagation();
+	const link = event.currentTarget;
+	const x = event.clientX;
+	const y = event.clientY;
+	link.style.display = 'none';
+	const under = document.elementFromPoint(x, y);
+	link.style.display = 'block';
+	const card = under && under.closest && under.closest('.app-card');
+	if (card) card.click();
+}
+
+function findOpenPost(posts, title, versionText) {
+	const matches = posts.filter((post) => post.post_title === title);
+	if (matches.length <= 1) return matches[0] || null;
+	const version = String(versionText || '').replace(/^v/i, '');
+	return matches.find((post) => post.version === version) || matches[0];
+}
+
+function openPostHref(post) {
+	const type = String(post.post_type || '').toLowerCase();
+	const kind = type.includes('game')
+		? 'games'
+		: type.includes('solution')
+			? 'solution'
+			: type.includes('article')
+				? 'article'
+				: 'apps';
+	return location.origin + '/' + kind + '/' + post.post_url + '.html';
+}
+
+function collectOpenPosts() {
+	const found = [];
+	try {
+		const data = unsafeWindow.useNuxtApp().payload.data;
+		visitOpenPosts(data, found);
+	} catch (e) {}
+	if (found.length) return found;
+	return parseOpenPosts();
+}
+
+function visitOpenPosts(root, found) {
+	const seen = new WeakSet();
+	const visit = (node) => {
+		if (!node || typeof node !== 'object' || seen.has(node)) return;
+		seen.add(node);
+		if (
+			typeof node.post_url === 'string' &&
+			typeof node.post_type === 'string' &&
+			typeof node.post_title === 'string'
+		) {
+			found.push(node);
+		}
+		const values = Array.isArray(node) ? node : Object.values(node);
+		values.forEach(visit);
+	};
+	visit(root);
+}
+
+function parseOpenPosts() {
+	const el = document.querySelector('#__NUXT_DATA__');
+	if (!el) return [];
+	let arr;
+	try {
+		arr = JSON.parse(el.textContent);
+	} catch (e) {
+		return [];
+	}
+	if (!Array.isArray(arr)) return [];
+	const cache = new Array(arr.length);
+	const resolving = new Set();
+	const resolve = (index) => {
+		if (cache[index] !== undefined) return cache[index];
+		if (resolving.has(index)) return null;
+		resolving.add(index);
+		const value = arr[index];
+		let out = value;
+		if (
+			Array.isArray(value) &&
+			value.length === 2 &&
+			typeof value[0] === 'string' &&
+			typeof value[1] === 'number'
+		) {
+			out = resolve(value[1]);
+		} else if (Array.isArray(value)) {
+			out = [];
+			cache[index] = out;
+			value.forEach((item) => {
+				out.push(typeof item === 'number' ? resolve(item) : item);
+			});
+		} else if (value && typeof value === 'object') {
+			out = {};
+			cache[index] = out;
+			Object.entries(value).forEach(([key, item]) => {
+				out[key] = typeof item === 'number' ? resolve(item) : item;
+			});
+		}
+		cache[index] = out;
+		resolving.delete(index);
+		return out;
+	};
+	const found = [];
+	try {
+		const root = resolve(0);
+		if (root) visitOpenPosts(root.data || root, found);
+	} catch (e) {}
+	return found;
+}
+
 // Main logic for Digit77 ---------------------------------------------------------
 function handleDigit77() {
 	$(document).ready(function () {
+		startOpenLinks();
 		// Create settings form directly
 		const settingsFormHtml = `
 		<details style="margin-top: 20px;">
